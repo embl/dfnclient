@@ -5,7 +5,9 @@ from sys import exit
 import click
 from termcolor import colored, cprint
 
-from dfngen import openssl, soap
+from dfngen import openssl
+from dfngen import soap
+
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
@@ -82,13 +84,14 @@ def create_cert(fqdn, pin, applicant, config, additional, requestnumber):
     click.confirm('Are these values correct?', default=True, abort=True)
     print('Generating certificate')
     if additional:
-        req = openssl.gen_csr_with_new_cert(
+        req = openssl.cert_with_no_key(
+
             conf['fqdn'],
             conf['subject'],
             conf['password'],
             conf['altnames'])
     else:
-        req = openssl.gen_csr_with_new_cert(conf['fqdn'], conf['subject'],
+        req = openssl.cert_with_no_key(conf['fqdn'], conf['subject'],
                                             conf['password'])
     conf['pin'] = pin
     conf['profile'] = 'Web Server'
@@ -153,10 +156,10 @@ def gen_existing(fqdn, pin, applicant, config, path, additional, requestnumber):
         cprint('{}: {}'.format(key, value), 'yellow')
     click.confirm('Are these values correct?', default=True, abort=True)
     print('Generating certificate signing request')
-    req = openssl.gen_csr_with_existing_cert(
-        path,
+    req = openssl.cert_with_key(
         conf['fqdn'],
         conf['subject'],
+        path,
     )
     conf['pin'] = pin
     conf['profile'] = 'Web Server'
