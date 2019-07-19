@@ -5,8 +5,8 @@ from sys import exit
 import click
 from termcolor import colored, cprint
 
-from dfngen import openssl
-from dfngen import soap
+import openssl
+import soap
 
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -83,9 +83,9 @@ def create_cert(fqdn, pin, applicant, config, additional, requestnumber):
         cprint('{}: {}'.format(key, value), 'yellow')
     click.confirm('Are these values correct?', default=True, abort=True)
     print('Generating certificate')
+    print("altnames",conf['altnames'])
     if additional:
         req = openssl.cert_with_no_key(
-
             conf['fqdn'],
             conf['subject'],
             conf['password'],

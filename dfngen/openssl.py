@@ -24,7 +24,7 @@ def write_key_to_disk(key,path="/Users/kelleher/Documents/keys/key.pem", passphr
         ))
 
 
-def generate_csr(common_name, subject, password=b"passphrase", altnames=[], key="", path="/Users/kelleher/Documents/keys/csr.pem"):
+def generate_csr(common_name, subject, password= b"passphrase", altnames=[], key="", path="/Users/kelleher/Documents/keys/csr.pem"):
     # need to split subject by / and assign new vars
     subjectStr = str(subject)
     subjects = subjectStr.split("/")
@@ -37,16 +37,16 @@ def generate_csr(common_name, subject, password=b"passphrase", altnames=[], key=
     print(locality_name)
     organization_name = subjects[4][2:]
     print(organization_name)
-    with open(path, key) as key_file:
-        key = serialization.load_pem_private_key(
-            key_file.read(),
-            password=password,
-            backend=default_backend()
-        )
+    print(password)
+    passwordAsBytes = str.encode(password)
+    with open(path, "rb") as key_file:
+        key = serialization.load_pem_private_key(key_file.read(), password=passwordAsBytes, backend=default_backend())
     dnsNames = []
+    print("are we getting this far")
     print("altname", altnames)
     if altnames is not []:
         for altname in dnsNames:
+            print('1')
             print("altname",altname)
             dnsNames.append(x509.DNSName(altname))
     csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
@@ -73,14 +73,15 @@ def generate_csr(common_name, subject, password=b"passphrase", altnames=[], key=
 
 
 #1
-def cert_with_key(common_name, subject, password=None,altnames=None,key = "", path="/Users/kelleher/Documents/keys/csr.pem"):
-    csr = generate_csr(common_name, subject, password,altnames, key,path)
+def cert_with_key(common_name, subject, password=None,altnames=[],key = "", path="/Users/kelleher/Documents/keys/csr.pem"):
+    csr = generate_csr(common_name, subject, password, altnames, key, path)
     return csr
 
 
 # 2
-def cert_with_no_key(common_name, subject, password=None,altnames="", path="/Users/kelleher/Documents/keys/csr.pem"):
+def cert_with_no_key(common_name, subject, password=None,altnames=[], path="/Users/kelleher/Documents/keys/csr.pem"):
     key = generate_key()
+    print(altnames)
     write_key_to_disk(key,"/Users/kelleher/Documents/keys/csr.pem")
 
     csr = generate_csr(common_name, subject, password,altnames, key, path="/Users/kelleher/Documents/keys/csr.pem")
